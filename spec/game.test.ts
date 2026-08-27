@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { JSDOM } from "jsdom";
 import { describe, expect, it } from "vitest";
+import { isObstacleCleared } from "../rules";
 
 // Runs against the BUILT site, same as spec/invariants.test.ts.
 const doc = new JSDOM(readFileSync(resolve("dist/index.html"), "utf8")).window
@@ -31,8 +32,23 @@ describe("crit-5: no tutorial anywhere on screen", () => {
   });
 });
 
-// crit-5 spec: "one rule of the game has a focused automated test." This is
-// yours to fill in once the mechanic exists -- pull the core rule (the
-// collision, the scoring threshold, the move that ends the round) out of the
-// rendering/Kaplay glue into a plain function you can call directly here.
-describe.todo("crit-5: the core rule under test");
+// crit-5 spec: "one rule of the game has a focused automated test." The core
+// rule is the obstacle-clear condition, pulled out of the rendering/Kaplay
+// glue into a plain function (rules.ts) so it's testable with no DOM/canvas.
+describe("crit-5: the core rule under test", () => {
+  it("stays blocked below threshold", () => {
+    expect(isObstacleCleared(2, 3)).toBe(false);
+  });
+
+  it("clears exactly at threshold", () => {
+    expect(isObstacleCleared(3, 3)).toBe(true);
+  });
+
+  it("stays cleared above threshold", () => {
+    expect(isObstacleCleared(5, 3)).toBe(true);
+  });
+
+  it("treats a zero threshold as already cleared", () => {
+    expect(isObstacleCleared(0, 0)).toBe(true);
+  });
+});
