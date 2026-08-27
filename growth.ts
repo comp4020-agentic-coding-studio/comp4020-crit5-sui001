@@ -7,7 +7,8 @@ const BASE_SCALE = 0.6;
 const MAX_SCALE = 2.2;
 const BASE_SATURATION = 0.35;
 
-const VIVID: readonly [number, number, number] = [120, 200, 255];
+const VIVID_COOL: readonly [number, number, number] = [120, 200, 255];
+const VIVID_WARM: readonly [number, number, number] = [255, 200, 120];
 const GREY = 160;
 
 function growthProgress(level: number): number {
@@ -19,9 +20,10 @@ export function growthScale(level: number): number {
   return BASE_SCALE + t * (MAX_SCALE - BASE_SCALE);
 }
 
-export function growthTint(level: number): [number, number, number] {
+export function growthTint(level: number, warm = false): [number, number, number] {
   const t = growthProgress(level);
   const saturation = BASE_SATURATION + t * (1 - BASE_SATURATION);
+  const vivid = warm ? VIVID_WARM : VIVID_COOL;
   const mix = (channel: number) => Math.round(GREY + (channel - GREY) * saturation);
-  return [mix(VIVID[0]), mix(VIVID[1]), mix(VIVID[2])];
+  return [mix(vivid[0]), mix(vivid[1]), mix(vivid[2])];
 }

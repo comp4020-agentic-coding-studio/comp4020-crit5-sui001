@@ -1,6 +1,7 @@
 // The TypeScript entry point, loaded as a module by index.html. Vite compiles
 // it; `pnpm typecheck` type-checks it.
 import kaplay from "kaplay";
+import { maybeShowCheckpoint } from "./checkpoint";
 import { growthScale, growthTint } from "./growth";
 import { renderHud } from "./hud";
 import { isObstacleCleared, resourceCounts } from "./rules";
@@ -25,6 +26,8 @@ const PLAYER_START_X = 40;
 k.scene("universe", (def: UniverseDef) => {
   const mode = VIEW_MODES[def.viewMode];
   k.setGravity(mode.gravity);
+  const [bgR, bgG, bgB] = def.isGarden ? [40, 60, 40] : [20, 20, 30];
+  k.setBackground(bgR, bgG, bgB);
 
   state.universe = def;
   state.obstacleProgress = new Array(def.obstacleCount).fill(0);
@@ -40,7 +43,7 @@ k.scene("universe", (def: UniverseDef) => {
     ]);
   }
 
-  const tint = growthTint(state.growthLevel);
+  const tint = growthTint(state.growthLevel, def.isGarden);
   const pickupScale = 1 + upgradeLevel(state, "pickupRadius") * 0.25;
   const walkSpeed = PLAYER_SPEED + upgradeLevel(state, "walkSpeed") * 20;
 
@@ -64,11 +67,12 @@ k.scene("universe", (def: UniverseDef) => {
     const x = PLAYER_START_X + OBSTACLE_SPACING * (i + 1);
     const midY = mode.playerStartY(k);
 
+    const [obsR, obsG, obsB] = def.isGarden ? [90, 160, 90] : [200, 80, 80];
     const obstacle = k.add([
       k.rect(20, 200),
       k.pos(x, midY),
       k.anchor("center"),
-      k.color(200, 80, 80),
+      k.color(obsR, obsG, obsB),
       k.area(),
       k.body({ isStatic: true }),
       "obstacle",
@@ -110,7 +114,11 @@ k.scene("universe", (def: UniverseDef) => {
     if (state.obstacleProgress.every((n) => isObstacleCleared(n, def.resourceThreshold))) {
       state.clearedUniverseCount++;
       state.growthLevel++;
-      k.wait(0.5, () => k.go("universe", rollUniverse()));
+
+      const jumpToNext = () => k.go("universe", rollUniverse());
+      if (!maybeShowCheckpoint(k, state, jumpToNext)) {
+        k.wait(0.5, jumpToNext);
+      }
     }
   }
 
@@ -135,6 +143,30 @@ k.scene("universe", (def: UniverseDef) => {
     player.move(walkSpeed, 0);
     mode.steerInput(k, player);
   });
+});
+
+k.scene("ending", () => {
+  state.ended = true;
+  k.setBackground(15, 15, 20);
+
+  k.add([
+    k.text("Flicker settled.", { size: 28 }),
+    k.pos(k.width() / 2, k.height() / 2 - 50),
+    k.anchor("center"),
+    k.fixed(),
+    k.color(255, 255, 255),
+  ]);
+
+  k.add([
+    k.text(
+      `${state.clearedUniverseCount} universe(s) held still long enough to count.\n${state.currency} sparks to show for it.`,
+      { size: 16, width: k.width() - 160, align: "center" },
+    ),
+    k.pos(k.width() / 2, k.height() / 2 + 10),
+    k.anchor("center"),
+    k.fixed(),
+    k.color(200, 200, 200),
+  ]);
 });
 
 k.go("universe", rollUniverse());
