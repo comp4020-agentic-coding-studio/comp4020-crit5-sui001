@@ -4,6 +4,7 @@
 // with "keep going" continuing the incremental for anyone who wants more.
 
 import type { KAPLAYCtx } from "kaplay";
+import { sfx } from "./sfx";
 import type { RunState } from "./state";
 
 const CHECKPOINT_TAG = "checkpoint";
@@ -13,18 +14,18 @@ function showCheckpoint(k: KAPLAYCtx, state: RunState, onContinue: () => void): 
     k.rect(k.width(), k.height()),
     k.pos(0, 0),
     k.color(0, 0, 0),
-    k.opacity(0.75),
+    k.opacity(0.88),
     k.fixed(),
     CHECKPOINT_TAG,
   ]);
 
   k.add([
     k.text("One universe down. Call it five minutes of flickering.", {
-      size: 18,
-      width: k.width() - 120,
+      size: 26,
+      width: k.width() - 160,
       align: "center",
     }),
-    k.pos(k.width() / 2, k.height() / 2 - 70),
+    k.pos(k.width() / 2, k.height() / 2 - 90),
     k.anchor("center"),
     k.fixed(),
     k.color(255, 255, 255),
@@ -32,8 +33,8 @@ function showCheckpoint(k: KAPLAYCtx, state: RunState, onContinue: () => void): 
   ]);
 
   const endBtn = k.add([
-    k.rect(170, 40),
-    k.pos(k.width() / 2 - 190, k.height() / 2 + 10),
+    k.rect(220, 56),
+    k.pos(k.width() / 2 - 240, k.height() / 2 + 20),
     k.anchor("center"),
     k.color(150, 70, 70),
     k.area(),
@@ -41,21 +42,22 @@ function showCheckpoint(k: KAPLAYCtx, state: RunState, onContinue: () => void): 
     CHECKPOINT_TAG,
   ]);
   k.add([
-    k.text("end here", { size: 14 }),
-    k.pos(k.width() / 2 - 190, k.height() / 2 + 10),
+    k.text("end here", { size: 20 }),
+    k.pos(k.width() / 2 - 240, k.height() / 2 + 20),
     k.anchor("center"),
     k.fixed(),
     k.color(255, 255, 255),
     CHECKPOINT_TAG,
   ]);
   endBtn.onClick(() => {
+    sfx(k, "buy");
     for (const obj of k.get(CHECKPOINT_TAG)) k.destroy(obj);
     k.go("ending");
   });
 
   const continueBtn = k.add([
-    k.rect(170, 40),
-    k.pos(k.width() / 2 + 20, k.height() / 2 + 10),
+    k.rect(220, 56),
+    k.pos(k.width() / 2 + 20, k.height() / 2 + 20),
     k.anchor("center"),
     k.color(70, 120, 70),
     k.area(),
@@ -63,14 +65,15 @@ function showCheckpoint(k: KAPLAYCtx, state: RunState, onContinue: () => void): 
     CHECKPOINT_TAG,
   ]);
   k.add([
-    k.text("keep flickering", { size: 14 }),
-    k.pos(k.width() / 2 + 20, k.height() / 2 + 10),
+    k.text("keep flickering", { size: 20 }),
+    k.pos(k.width() / 2 + 20, k.height() / 2 + 20),
     k.anchor("center"),
     k.fixed(),
     k.color(255, 255, 255),
     CHECKPOINT_TAG,
   ]);
   continueBtn.onClick(() => {
+    sfx(k, "buy");
     for (const obj of k.get(CHECKPOINT_TAG)) k.destroy(obj);
     state.paused = false;
     onContinue();

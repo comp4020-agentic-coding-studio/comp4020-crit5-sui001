@@ -2,13 +2,15 @@
 // their setup on every go(), so state that must survive a universe jump
 // lives here instead.
 
-import type { UniverseDef } from "./universes";
+import type { Theme } from "./themes";
 
 export interface RunState {
-  universe: UniverseDef | null;
-  universeIndex: number;
+  theme: Theme | null;
   currency: number;
-  obstacleProgress: number[];
+  // Progress through the CURRENT universe. `threshold` is rolled per universe
+  // and fed to isObstacleCleared() -- the one rule under automated test.
+  collected: number;
+  threshold: number;
   upgrades: Record<string, number>;
   growthLevel: number;
   clearedUniverseCount: number;
@@ -18,10 +20,10 @@ export interface RunState {
 }
 
 export const state: RunState = {
-  universe: null,
-  universeIndex: 0,
+  theme: null,
   currency: 0,
-  obstacleProgress: [],
+  collected: 0,
+  threshold: 0,
   upgrades: {},
   growthLevel: 0,
   clearedUniverseCount: 0,

@@ -1,24 +1,39 @@
-// Centralizes every loadSprite call behind one loadAssets(), called once
-// before the first go(). Every pack here ships individual per-sprite PNGs
-// (or a named XML atlas) rather than a raw grid sheet, so no atlas-JSON
-// conversion step is needed -- plain loadSprite(name, path) is enough.
-// All art is Kenney's CC0 "Game Assets All-in-1" bundle.
+// Centralizes every load* call behind one loadAssets(), called once before the
+// first go().
+//
+// Tilesets load as ONE packed sheet each with sliceX/sliceY, which means a
+// tile index is literally a kaplay sprite frame: no atlas JSON, no per-tile
+// requests, and a whole level batches into very few draw calls because every
+// tile in it shares a texture.
+//
+// Art is Kenney's CC0 Tiny Town / Tiny Farm / Tiny Dungeon / Tiny Ski / Tiny
+// Battle packs. Audio is Kenney's CC0 Interface Sounds, Impact Sounds and
+// Music Jingles packs, renamed on the way in so a filename says what the
+// sound is *for* rather than what it sounds like.
 
 import type { KAPLAYCtx } from "kaplay";
+import { CLIPS_PER_FAMILY, FAMILIES } from "./music";
+import { SHEETS } from "./themes";
 
 export function loadAssets(k: KAPLAYCtx): void {
-  k.loadSprite("ship", "sprites/simple-space/ship_A.png");
-  k.loadSprite("meteor", "sprites/simple-space/meteor_detailedLarge.png");
-  k.loadSprite("star", "sprites/simple-space/star_small.png");
+  for (const sheet of SHEETS) {
+    k.loadSprite(sheet.name, `tilesets/${sheet.name}.png`, {
+      sliceX: sheet.cols,
+      sliceY: sheet.rows,
+    });
+  }
 
-  k.loadSprite("beige", "sprites/new-platformer/character_beige_idle.png");
-  k.loadSprite("rock", "sprites/new-platformer/rock.png");
-  k.loadSprite("coin", "sprites/new-platformer/coin_gold.png");
+  k.loadSound("pickup", "audio/pickup.ogg");
+  k.loadSound("clear", "audio/clear.ogg");
+  k.loadSound("bounce", "audio/bounce.ogg");
+  k.loadSound("thud", "audio/thud.ogg");
+  k.loadSound("jump", "audio/jump.ogg");
+  k.loadSound("buy", "audio/buy.ogg");
+  k.loadSound("settle", "audio/settle.ogg");
 
-  k.loadSprite("lightpost", "sprites/isometric-medieval-town/lightpost_01_0.png");
-  k.loadSprite("castleWall", "sprites/isometric-medieval-town/castle_wall_01_0.png");
-  k.loadSprite("banner", "sprites/isometric-medieval-town/banner_01_0.png");
-
-  k.loadSprite("tree", "sprites/foliage/foliagePack_010.png");
-  k.loadSprite("flower", "sprites/foliage/foliagePack_001.png");
+  for (const family of FAMILIES) {
+    for (let i = 0; i < CLIPS_PER_FAMILY; i++) {
+      k.loadSound(`${family}${i}`, `music/${family}${i}.ogg`);
+    }
+  }
 }
