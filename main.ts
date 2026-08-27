@@ -2,9 +2,11 @@
 // it; `pnpm typecheck` type-checks it.
 import kaplay from "kaplay";
 import { growthScale, growthTint } from "./growth";
-import { isObstacleCleared } from "./rules";
+import { renderHud } from "./hud";
+import { isObstacleCleared, resourceCounts } from "./rules";
 import { state } from "./state";
 import { rollUniverse, type UniverseDef } from "./universes";
+import { upgradeLevel } from "./upgrades";
 import { VIEW_MODES } from "./view-modes";
 
 const k = kaplay({
@@ -39,6 +41,8 @@ k.scene("universe", (def: UniverseDef) => {
   }
 
   const tint = growthTint(state.growthLevel);
+  const pickupScale = 1 + upgradeLevel(state, "pickupRadius") * 0.25;
+  const walkSpeed = PLAYER_SPEED + upgradeLevel(state, "walkSpeed") * 20;
 
   const player = k.add([
     k.rect(24, 24),
@@ -46,12 +50,13 @@ k.scene("universe", (def: UniverseDef) => {
     k.anchor("center"),
     k.color(...tint),
     k.scale(growthScale(state.growthLevel)),
-    k.area(),
+    k.area({ scale: pickupScale }),
     k.body(),
     "player",
   ]);
 
   mode.setupCamera(k, player);
+  renderHud(k, state);
 
   const obstacles: ReturnType<typeof k.add>[] = [];
 
@@ -79,14 +84,18 @@ k.scene("universe", (def: UniverseDef) => {
         k.color(255, 220, 100),
         k.area(),
         "resource",
-        { obstacleIndex: i },
+        { obstacleIndex: i, kind: def.resourceKind },
       ]);
     }
   }
 
-  k.onCollide("player", "resource", (_player, resource) => {
-    const idx = (resource as unknown as { obstacleIndex: number }).obstacleIndex;
+  type Resource = ReturnType<typeof k.add> & { obstacleIndex: number; kind: string };
 
+  function collectResource(resource: Resource) {
+    const acceptsAnyKind = upgradeLevel(state, "universalResonance") > 0;
+    if (!acceptsAnyKind && !resourceCounts(resource.kind, [def.resourceKind])) return;
+
+    const idx = resource.obstacleIndex;
     state.currency++;
     state.obstacleProgress[idx]++;
     k.destroy(resource);
@@ -96,17 +105,34 @@ k.scene("universe", (def: UniverseDef) => {
       if (obstacle.exists()) k.destroy(obstacle);
     }
 
+    renderHud(k, state);
+
     if (state.obstacleProgress.every((n) => isObstacleCleared(n, def.resourceThreshold))) {
       state.clearedUniverseCount++;
       state.growthLevel++;
       k.wait(0.5, () => k.go("universe", rollUniverse()));
     }
+  }
+
+  k.onCollide("player", "resource", (_player, resource) => {
+    collectResource(resource as unknown as Resource);
   });
+
+  if (upgradeLevel(state, "autoCollector") > 0) {
+    const AUTO_COLLECT_RANGE = 60;
+    k.loop(1, () => {
+      const nearest = k
+        .get("resource")
+        .filter((r) => player.pos.dist(r.pos) <= AUTO_COLLECT_RANGE)
+        .sort((a, b) => player.pos.dist(a.pos) - player.pos.dist(b.pos))[0];
+      if (nearest) collectResource(nearest as unknown as Resource);
+    });
+  }
 
   k.onUpdate(() => {
     if (state.paused) return;
 
-    player.move(PLAYER_SPEED, 0);
+    player.move(walkSpeed, 0);
     mode.steerInput(k, player);
   });
 });
