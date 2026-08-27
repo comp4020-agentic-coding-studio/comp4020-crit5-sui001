@@ -1,6 +1,7 @@
 // The TypeScript entry point, loaded as a module by index.html. Vite compiles
 // it; `pnpm typecheck` type-checks it.
 import kaplay from "kaplay";
+import { loadAssets } from "./assets";
 import { maybeShowCheckpoint } from "./checkpoint";
 import { growthScale, growthTint } from "./growth";
 import { renderHud } from "./hud";
@@ -19,9 +20,20 @@ const k = kaplay({
   global: false,
 });
 
+loadAssets(k);
+
 const PLAYER_SPEED = 120;
 const OBSTACLE_SPACING = 200;
 const PLAYER_START_X = 40;
+
+// Packs range from 64px tiles to 244px isometric pieces -- normalize every
+// role to a common on-screen footprint rather than rendering at native size.
+const PLAYER_TARGET = 36;
+const OBSTACLE_TARGET = 140;
+const RESOURCE_TARGET = 22;
+function spriteScale(nativeSize: number, target: number): number {
+  return target / nativeSize;
+}
 
 k.scene("universe", (def: UniverseDef) => {
   const mode = VIEW_MODES[def.viewMode];
@@ -48,11 +60,11 @@ k.scene("universe", (def: UniverseDef) => {
   const walkSpeed = PLAYER_SPEED + upgradeLevel(state, "walkSpeed") * 20;
 
   const player = k.add([
-    k.rect(24, 24),
+    k.sprite(def.playerSprite),
     k.pos(PLAYER_START_X, mode.playerStartY(k)),
     k.anchor("center"),
     k.color(...tint),
-    k.scale(growthScale(state.growthLevel)),
+    k.scale(spriteScale(def.playerSpriteSize, PLAYER_TARGET) * growthScale(state.growthLevel)),
     k.area({ scale: pickupScale }),
     k.body(),
     "player",
@@ -67,12 +79,11 @@ k.scene("universe", (def: UniverseDef) => {
     const x = PLAYER_START_X + OBSTACLE_SPACING * (i + 1);
     const midY = mode.playerStartY(k);
 
-    const [obsR, obsG, obsB] = def.isGarden ? [90, 160, 90] : [200, 80, 80];
     const obstacle = k.add([
-      k.rect(20, 200),
+      k.sprite(def.obstacleSprite),
       k.pos(x, midY),
       k.anchor("center"),
-      k.color(obsR, obsG, obsB),
+      k.scale(spriteScale(def.obstacleSpriteSize, OBSTACLE_TARGET)),
       k.area(),
       k.body({ isStatic: true }),
       "obstacle",
@@ -82,10 +93,10 @@ k.scene("universe", (def: UniverseDef) => {
 
     for (let r = 0; r < def.resourceThreshold + 1; r++) {
       k.add([
-        k.rect(10, 10),
+        k.sprite(def.resourceSprite),
         k.pos(x - 80 + r * 25, midY - 90 + (r % 2) * 180),
         k.anchor("center"),
-        k.color(255, 220, 100),
+        k.scale(spriteScale(def.resourceSpriteSize, RESOURCE_TARGET)),
         k.area(),
         "resource",
         { obstacleIndex: i, kind: def.resourceKind },
