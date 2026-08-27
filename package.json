@@ -12,6 +12,9 @@
     "check:evidence": "node scripts/check-evidence.ts",
     "test": "vitest run"
   },
+  "dependencies": {
+    "kaplay": "^3001.0.19"
+  },
   "devDependencies": {
     "@types/jsdom": "^27.0.0",
     "@types/node": "^24.0.0",

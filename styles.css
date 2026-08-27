@@ -14,3 +14,9 @@ main {
 a {
   color: #0b5fff;
 }
+
+#game canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
