@@ -49,10 +49,14 @@ import { random as defaultRandom } from "./rng";
 const p = (w: number, ...tiles: number[]): PropDef => ({ w, tiles });
 
 export const THEMES: readonly Theme[] = [
-  // Two themes per pack, the way one Kenney sheet gave both village and keep
-  // back when this ran on the Tiny packs: a sheet has more than one place in it
-  // if you pick different ground, a different route material and a different
-  // half of the props.
+  // Two themes per pack: a sheet has more than one place in it if you pick
+  // different ground, a different route material and a different half of the
+  // props.
+  //
+  // Order is one-per-pack first, then the second of each. progress.ts unlocks
+  // in this order and starts you on the first three, so grouping the pairs
+  // together meant two of the three opening themes came off one sheet and
+  // two-thirds of early runs looked identical.
   //
   // Frame indices for scribble-dungeon, hexagon-base and space-station are the
   // roster in scripts/pack-tileset.mjs, in order. nautical is Kenney's own
@@ -87,30 +91,6 @@ export const THEMES: readonly Theme[] = [
     bg: [246, 243, 236],
   },
   {
-    id: "crypt",
-    sheet: "scribble-dungeon",
-    cols: 8,
-    rows: 5,
-    tileW: 64,
-    // The cracked and decorative flagstones, where scrawl takes the clean ones.
-    ground: [2, 2, 2, 2, 3, 38, 39],
-    // Carpet and boards rather than track -- same dungeon, someone lived in it.
-    path: [32, 32, 35, 36],
-    props: [
-      p(1, 13), // coffin
-      p(1, 15), // table
-      p(1, 16), // bed
-      p(1, 17), // chair
-      p(1, 21), // puddle
-      p(1, 23), // stairs down
-      p(1, 12), // chest
-      p(1, 19), // tree
-    ],
-    pickups: [26, 27, 24, 25],
-    player: 29, // purple character token
-    bg: [234, 230, 222],
-  },
-  {
     id: "lagoon",
     sheet: "nautical",
     cols: 18,
@@ -141,33 +121,6 @@ export const THEMES: readonly Theme[] = [
     // helmet: the only thing on the sheet that reads as someone being here.
     player: 89,
     bg: [46, 106, 122],
-  },
-  {
-    id: "trench",
-    sheet: "nautical",
-    cols: 18,
-    rows: 15,
-    tileW: 70,
-    // Open water instead of seabed, which inverts the route: in lagoon the
-    // decking is the path over sand, here the sandbar is the path through deep
-    // water. Same sheet, opposite read.
-    ground: [4, 4, 4, 4, 4, 5],
-    path: [40, 40, 41],
-    props: [
-      p(1, 118), // stone column
-      p(1, 119), // column with algae
-      p(1, 120), // broken column
-      p(1, 125), // treasure chest
-      p(1, 34), // rusted anchor
-      p(1, 48), // yellow coral
-      p(1, 49), // blue coral
-      p(1, 50), // anemone
-      p(1, 32), // green weed
-      p(1, 83), // rock with coral
-    ],
-    pickups: [100, 101, 102, 105], // bubbles, air pocket, scallop, sea glass
-    player: 89,
-    bg: [22, 62, 78],
   },
   {
     id: "grove",
@@ -201,27 +154,6 @@ export const THEMES: readonly Theme[] = [
     // in the seams and has to look chosen. Dark slate reads as the board the
     // tiles sit on rather than as holes in the floor.
     bg: [38, 48, 54],
-  },
-  {
-    id: "badlands",
-    sheet: "hexagon-base",
-    cols: 6,
-    rows: 5,
-    tileW: 65,
-    ground: [3, 3, 3, 3, 3, 2], // sand, with dirt breaking it up
-    path: [4, 4, 6], // bare stone and the stone bridge
-    props: [
-      p(1, 26), // cactus
-      p(1, 27), // cactus
-      p(1, 14), // boulder
-      p(1, 15), // mossy boulder
-      p(1, 17), // small stone
-      p(1, 9), // autumn tree
-      p(1, 24), // lava pool
-    ],
-    pickups: [18, 19, 21, 20],
-    player: 28, // beige alien
-    bg: [48, 34, 30],
   },
   {
     id: "deck",
@@ -258,6 +190,78 @@ export const THEMES: readonly Theme[] = [
     // object on the sheet that reads as a thing that moves under its own steam.
     player: 31,
     bg: [22, 26, 38],
+  },
+  {
+    id: "crypt",
+    sheet: "scribble-dungeon",
+    cols: 8,
+    rows: 5,
+    tileW: 64,
+    // The cracked and decorative flagstones, where scrawl takes the clean ones.
+    ground: [2, 2, 2, 2, 3, 38, 39],
+    // Carpet and boards rather than track -- same dungeon, someone lived in it.
+    path: [32, 32, 35, 36],
+    props: [
+      p(1, 13), // coffin
+      p(1, 15), // table
+      p(1, 16), // bed
+      p(1, 17), // chair
+      p(1, 21), // puddle
+      p(1, 23), // stairs down
+      p(1, 12), // chest
+      p(1, 19), // tree
+    ],
+    pickups: [26, 27, 24, 25],
+    player: 29, // purple character token
+    bg: [234, 230, 222],
+  },
+  {
+    id: "trench",
+    sheet: "nautical",
+    cols: 18,
+    rows: 15,
+    tileW: 70,
+    // Open water instead of seabed, which inverts the route: in lagoon the
+    // decking is the path over sand, here the sandbar is the path through deep
+    // water. Same sheet, opposite read.
+    ground: [4, 4, 4, 4, 4, 5],
+    path: [40, 40, 41],
+    props: [
+      p(1, 118), // stone column
+      p(1, 119), // column with algae
+      p(1, 120), // broken column
+      p(1, 125), // treasure chest
+      p(1, 34), // rusted anchor
+      p(1, 48), // yellow coral
+      p(1, 49), // blue coral
+      p(1, 50), // anemone
+      p(1, 32), // green weed
+      p(1, 83), // rock with coral
+    ],
+    pickups: [100, 101, 102, 105], // bubbles, air pocket, scallop, sea glass
+    player: 89,
+    bg: [22, 62, 78],
+  },
+  {
+    id: "badlands",
+    sheet: "hexagon-base",
+    cols: 6,
+    rows: 5,
+    tileW: 65,
+    ground: [3, 3, 3, 3, 3, 2], // sand, with dirt breaking it up
+    path: [4, 4, 6], // bare stone and the stone bridge
+    props: [
+      p(1, 26), // cactus
+      p(1, 27), // cactus
+      p(1, 14), // boulder
+      p(1, 15), // mossy boulder
+      p(1, 17), // small stone
+      p(1, 9), // autumn tree
+      p(1, 24), // lava pool
+    ],
+    pickups: [18, 19, 21, 20],
+    player: 28, // beige alien
+    bg: [48, 34, 30],
   },
   {
     id: "engineering",
@@ -302,6 +306,7 @@ export const SHEETS: ReadonlyArray<{ name: string; cols: number; rows: number }>
 // each sheet, an immediate repeat is the one outcome that makes the set feel
 // smaller than it is.
 let lastThemeId: string | null = null;
+let lastSheet: string | null = null;
 
 export function rollTheme(
   allowed?: readonly string[],
@@ -311,13 +316,21 @@ export function rollTheme(
     ? THEMES.filter((t) => allowed.includes(t.id))
     : THEMES;
   const usable = pool.length > 0 ? pool : THEMES;
-  const fresh = usable.filter((t) => t.id !== lastThemeId);
-  const options = fresh.length > 0 ? fresh : usable;
+  // Prefer a different SHEET, not just a different id. Two themes cut from one
+  // pack are different places but the same art, and back to back they read as
+  // the same universe twice -- which is exactly the thing this is here to stop.
+  // Falling back through id and then the whole pool means a one-theme pool
+  // still returns something instead of deadlocking.
+  const bySheet = usable.filter((t) => t.sheet !== lastSheet);
+  const byId = usable.filter((t) => t.id !== lastThemeId);
+  const options = bySheet.length > 0 ? bySheet : byId.length > 0 ? byId : usable;
   const picked = options[Math.floor(random() * options.length)];
   lastThemeId = picked.id;
+  lastSheet = picked.sheet;
   return picked;
 }
 
 export function resetThemeHistory(): void {
   lastThemeId = null;
+  lastSheet = null;
 }
