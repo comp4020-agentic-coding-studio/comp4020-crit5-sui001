@@ -1,11 +1,14 @@
-// Ten themes over five Kenney CC0 tilesets. Each tileset ships as one packed
-// 16px sheet loaded with sliceX/sliceY, so a tile index IS a kaplay sprite
-// frame -- no atlas JSON, no per-tile HTTP requests, one texture per theme
-// (which also means the whole level batches into very few draw calls).
+// Thirteen themes over eight Kenney CC0 tilesets. Each tileset is one packed
+// sheet loaded with sliceX/sliceY, so a tile index IS a kaplay sprite frame --
+// no atlas JSON, no per-tile HTTP requests, one texture per theme (which also
+// means the whole level batches into very few draw calls).
 //
 // A theme is data, not code: the generator in level.ts knows nothing about
-// villages or dungeons, only about ground/path/prop/pickup roles. Adding an
-// eleventh theme is a new entry here and nothing else.
+// villages or dungeons, only about ground/path/prop/pickup roles. Adding a
+// fourteenth theme is a new entry here and nothing else.
+//
+// The five "Tiny" packs are 16px art; the three later ones are 64-92px. That
+// is what `tileW` is for -- see the field's own note.
 
 export interface PropDef {
   // Row-major tile indices of the footprint, `w` wide. Lets a 1x1 mushroom
@@ -14,11 +17,20 @@ export interface PropDef {
   tiles: number[];
 }
 
+// Every theme drew at a flat scale of 3 while all five packs were 16px art.
+// The newer packs are 64px and up, and a 64px tile at 3x is four times the
+// width of the 48px grid cell it is meant to sit in -- so scale has to follow
+// the source art rather than being a constant. Omitted means 16, which is why
+// none of the original ten themes carry it and all of them still draw at 3x.
+export const DEFAULT_TILE_W = 16;
+
 export interface Theme {
   id: string;
   sheet: string;
   cols: number;
   rows: number;
+  // Native pixel width of one frame on this theme's sheet. See DEFAULT_TILE_W.
+  tileW?: number;
   // Ground fills everything; index 0 is the plain variant and gets most of
   // the weight, the rest are speckles so large fields don't look stamped.
   ground: number[];
@@ -250,6 +262,116 @@ export const THEMES: readonly Theme[] = [
     player: 124,
     bg: [64, 110, 58],
   },
+  // The last three sheets are built by scripts/pack-tileset.mjs rather than
+  // shipped in this shape by Kenney -- their frame layout is that script's
+  // roster, in order, so read it if an index here looks arbitrary.
+  {
+    id: "scrawl",
+    sheet: "scribble-dungeon",
+    cols: 8,
+    rows: 5,
+    tileW: 64,
+    ground: [0, 0, 0, 0, 0, 1, 2, 3],
+    // Minecart track, not the pack's own floor_path -- that one is a few faint
+    // scratches on the same flagstone as the ground and disappears entirely at
+    // play scale, and a route you can't see is the whole game gone.
+    path: [4, 4, 5, 6],
+    props: [
+      p(1, 8), // barrel
+      p(1, 9), // barrels
+      p(1, 10), // crate
+      p(1, 11), // small crate
+      p(1, 12), // chest
+      p(1, 13), // coffin
+      p(1, 14), // campfire
+      p(1, 15), // table
+      p(1, 16), // bed
+      p(1, 17), // chair
+      p(1, 18), // cart
+      p(1, 19), // tree
+      p(1, 20), // plants
+      p(1, 22), // trapdoor
+      p(1, 23), // stairs down
+    ],
+    pickups: [24, 25, 26, 27], // sword, axe, shield, staff
+    player: 28, // green character token
+    // Sketch art on white: the background is the paper it is drawn on, so this
+    // is the one theme where a near-white bg is the point rather than a bug.
+    bg: [246, 243, 236],
+  },
+  {
+    id: "lagoon",
+    sheet: "nautical",
+    cols: 18,
+    rows: 15,
+    tileW: 70,
+    // Plain seabed and its pebbled variant only -- the neighbouring sand frames
+    // are edge pieces with a lavender corner baked in, which tiled across a
+    // field reads as purple confetti.
+    ground: [40, 40, 40, 40, 40, 41],
+    // Ship decking, including the planks with a porthole set into them -- the
+    // walking line reads as a jetty laid over the seabed.
+    path: [111, 129, 129, 111, 113],
+    props: [
+      p(1, 64), // rock
+      p(1, 66), // rock
+      p(1, 82), // rock with coral
+      p(1, 84), // rock with coral
+      p(1, 10), // pink kelp
+      p(1, 28), // green kelp
+      p(1, 32), // green leafy weed
+      p(1, 46), // purple coral
+      p(1, 47), // orange coral
+      p(1, 49), // blue coral
+      p(1, 50), // anemone
+      p(1, 16), // anchor
+      p(1, 34), // rusted anchor
+      p(1, 150), // barrel
+      p(1, 124), // treasure chest
+      p(1, 118), // stone column
+    ],
+    pickups: [85, 87, 104, 105], // starfish, snail shell, pearl clam, sea glass
+    // This pack has no character tile of any kind, so the player is the diving
+    // helmet: the only thing on the sheet that reads as someone being here.
+    player: 89,
+    bg: [46, 106, 122],
+  },
+  {
+    id: "grove",
+    sheet: "hexagon-base",
+    cols: 6,
+    rows: 4,
+    // 65, not the 92px cell: a hex is 65 wide inside that cell, so scaling by
+    // the cell leaves a quarter-tile of background at every edge and the field
+    // reads as scattered confetti. Scaling by the hex itself makes them meet
+    // side to side, and the spare cell height is the transparent margin the
+    // rows nest into.
+    tileW: 65,
+    // Grass only. Dirt is the same brown as the wooden bridge that marks the
+    // route, and a path you can't pick out from the ground is no path.
+    ground: [0],
+    // Actual bridge tiles, so this is the one late theme that needs no pathTint.
+    path: [6, 6, 7],
+    props: [
+      p(1, 8), // green tree
+      p(1, 9), // autumn tree
+      p(1, 10), // green pine
+      p(1, 11), // blue pine
+      p(1, 12), // bush
+      p(1, 13), // magic bush
+      p(1, 14), // boulder
+      p(1, 15), // mossy boulder
+      p(1, 16), // small rock
+      p(1, 17), // small stone
+      p(1, 21), // cactus
+    ],
+    pickups: [18, 19, 20, 21], // red, yellow, blue and white flowers
+    player: 22, // green alien
+    // Hexes on a square walk grid don't tile flush -- the bg shows through at
+    // every cell corner, so it has to look chosen. Dark slate reads as the
+    // board the tiles are sitting on rather than as gaps in the floor.
+    bg: [38, 48, 54],
+  },
 ];
 
 // The sheets actually referenced above, deduped -- assets.ts loads exactly
@@ -261,8 +383,8 @@ export const SHEETS: ReadonlyArray<{ name: string; cols: number; rows: number }>
   }, {}),
 );
 
-// Never the same theme twice running -- with ten of them, an immediate repeat
-// is the one outcome that makes the set feel smaller than it is.
+// Never the same theme twice running -- with thirteen of them, an immediate
+// repeat is the one outcome that makes the set feel smaller than it is.
 let lastThemeId: string | null = null;
 
 export function rollTheme(

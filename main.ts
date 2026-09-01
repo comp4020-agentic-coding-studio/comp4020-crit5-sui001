@@ -28,7 +28,7 @@ import { gradeFor, runScore } from "./score";
 import { settings } from "./settings";
 import { sfx } from "./sfx";
 import { resetRun, state } from "./state";
-import { type Theme, resetThemeHistory, rollTheme } from "./themes";
+import { DEFAULT_TILE_W, type Theme, resetThemeHistory, rollTheme } from "./themes";
 import { upgradeLevel } from "./upgrades";
 
 const LOGICAL_WIDTH = 1280;
@@ -125,6 +125,11 @@ k.scene("universe", (theme: Theme) => {
     MIN_THRESHOLD + Math.floor(seededRandom() * (MAX_THRESHOLD - MIN_THRESHOLD + 1));
   k.setBackground(...theme.bg);
 
+  // SCALE is the 16px-art number. Themes drawn from the larger packs need their
+  // own, or a 70px nautical tile would land four cells wide. Grid positions
+  // still step by TS -- only how big a frame is drawn changes.
+  const tileScale = TS / (theme.tileW ?? DEFAULT_TILE_W);
+
   const level = generateLevel(theme, {
     cols: LEVEL_COLS,
     rows: LEVEL_ROWS,
@@ -144,7 +149,7 @@ k.scene("universe", (theme: Theme) => {
       k.add([
         k.sprite(theme.sheet, { frame: level.path[i] ?? level.ground[i] }),
         k.pos(col * TS, row * TS),
-        k.scale(SCALE),
+        k.scale(tileScale),
         k.color(tint[0], tint[1], tint[2]),
         k.z(0),
       ]);
@@ -157,7 +162,7 @@ k.scene("universe", (theme: Theme) => {
         k.add([
           k.sprite(theme.sheet, { frame: prop.tiles[dy * prop.w + dx] }),
           k.pos((prop.col + dx) * TS, (prop.row + dy) * TS),
-          k.scale(SCALE),
+          k.scale(tileScale),
           k.z(1),
         ]);
       }
@@ -171,7 +176,7 @@ k.scene("universe", (theme: Theme) => {
   const worldWidth = level.cols * TS;
   const spineLength = level.route.length;
 
-  const playerScale = SCALE * (0.8 + growthScale(state.growthLevel) * 0.4);
+  const playerScale = tileScale * (0.8 + growthScale(state.growthLevel) * 0.4);
   const player = k.add([
     k.sprite(theme.sheet, { frame: theme.player }),
     k.pos(nodePos[0]),
@@ -283,7 +288,7 @@ k.scene("universe", (theme: Theme) => {
       k.sprite(theme.sheet, { frame: pu.tile }),
       k.pos(pu.col * TS + TS / 2, pu.row * TS + TS / 2),
       k.anchor("center"),
-      k.scale(SCALE),
+      k.scale(tileScale),
       k.color(tint[0], tint[1], tint[2]),
       k.area(),
       k.z(3),
@@ -656,7 +661,7 @@ k.scene("universe", (theme: Theme) => {
       if (pickup.taken || !pickup.exists()) continue;
       const lit = nowInRange.has(pickup);
       const pulse = lit ? 1 + 0.16 * (1 - beatPhase(k.time())) : 1;
-      pickup.scale = k.vec2(SCALE * pulse);
+      pickup.scale = k.vec2(tileScale * pulse);
       if (pickup.kind === "decoy" && player.pos.dist(pickup.pos) <= range * DECOY_REVEAL) {
         pickup.color = k.rgb(HARM_TINT[0], HARM_TINT[1], HARM_TINT[2]);
       }
