@@ -7,7 +7,7 @@ import { THEMES } from "./themes";
 
 const KEY = "flicker.progress";
 
-// Three to start with. Ten themes handed over at once is a menu; three that
+// Three to start with. Eight themes handed over at once is a menu; three that
 // grow is a reason to come back.
 export const STARTING_THEMES = 3;
 

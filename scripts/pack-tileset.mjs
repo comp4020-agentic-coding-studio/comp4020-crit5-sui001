@@ -156,7 +156,7 @@ const recipes = {
     return packGrid({
       cell: 92,
       cols: 6,
-      rows: 4,
+      rows: 5,
       tiles: [
         // row 0 -- ground candidates
         png("tileGrass_tile"), png("tileMagic_tile"), png("tileDirt_tile"),
@@ -171,6 +171,45 @@ const recipes = {
         // blown up to something a player can actually aim at; see upscale().
         [png("flowerRed"), 4], [png("flowerYellow"), 4], [png("flowerBlue"), 4],
         [png("flowerWhite"), 4], png("alienGreen"), png("alienPink"),
+        // row 4 -- the desert/volcanic set the second hex theme is built from
+        png("tileLava_tile"), png("tileSnow_tile"), png("treeCactus_1"),
+        png("treeCactus_3"), png("alienBeige"), png("alienYellow"),
+      ],
+    });
+  },
+
+  // Filed under 3D assets, and its Models/ directory is glb/fbx/obj -- but
+  // Previews/ holds a rendered 64x64 PNG of every model, transparent and
+  // semantically named. That is a better-formed tileset than either of the two
+  // above, and needs no 3D rendering at all; it just isn't where you look for
+  // one. Curated rather than dropped in whole, so the roster stays indexable.
+  "space-station": () => {
+    const dir = `${KENNEY}/3D assets/Space Station Kit/Previews`;
+    const png = (n) => `${dir}/${n}.png`;
+    return packGrid({
+      cell: 64,
+      cols: 8,
+      rows: 6,
+      tiles: [
+        // row 0 -- ground and the panelled variants that mark a route
+        png("floor"), png("floor-detail"), png("floor-corner"), png("floor-panel"),
+        png("floor-panel-straight"), png("floor-panel-corner"), png("floor-panel-end"),
+        png("balcony-floor"),
+        // row 1 -- structure
+        png("balcony-floor-center"), png("balcony-rail"), png("wall"), png("wall-window"),
+        png("wall-door"), png("wall-pillar"), png("wall-corner"), png("wall-detail"),
+        // row 2 -- consoles
+        png("display-wall"), png("computer"), png("computer-wide"), png("computer-screen"),
+        png("computer-system"), png("table"), png("table-large"), png("table-display"),
+        // row 3 -- furnishings
+        png("table-display-planet"), png("table-inset"), png("chair"), png("chair-cushion"),
+        png("bed-single"), png("bed-double"), png("container"), png("container-tall"),
+        // row 4 -- cargo and plumbing
+        png("container-wide"), png("container-flat"), png("container-flat-open"), png("pipe"),
+        png("pipe-bend"), png("pipe-ring-colored"), png("pipe-end-colored"), png("structure"),
+        // row 5 -- pickups and the two player stand-ins
+        png("structure-barrier"), png("structure-panel"), png("stairs"), png("stairs-ramp"),
+        png("rocks"), png("wall-switch"), png("skip"), png("skip-rocks"),
       ],
     });
   },

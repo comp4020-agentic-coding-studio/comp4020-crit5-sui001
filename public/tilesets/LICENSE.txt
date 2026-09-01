@@ -1,11 +1,7 @@
-	Tiny Town (1.1)
-	Tiny Farm (1.0)
-	Tiny Dungeon (1.0)
-	Tiny Ski (1.0)
-	Tiny Battle (1.0)
 	Scribble Dungeons (1.0)
 	Platformer Pack Nautical (1.0)
 	Hexagon Base Pack (1.0)
+	Space Station Kit (1.0)
 
 	Created/distributed by Kenney (www.kenney.nl)
 

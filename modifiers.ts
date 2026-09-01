@@ -1,5 +1,5 @@
-// A twist rolled per universe, on top of its theme. Two villages should not
-// play the same, and ten themes stop being ten experiences very quickly if the
+// A twist rolled per universe, on top of its theme. Two lagoons should not
+// play the same, and eight themes stop being eight experiences very quickly if the
 // only thing changing is the wallpaper.
 //
 // Pure data plus one roll function, so spec/modifiers.test.ts can assert every

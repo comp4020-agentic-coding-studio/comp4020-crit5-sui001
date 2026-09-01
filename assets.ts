@@ -6,8 +6,10 @@
 // requests, and a whole level batches into very few draw calls because every
 // tile in it shares a texture.
 //
-// Art is Kenney's CC0 Tiny Town / Tiny Farm / Tiny Dungeon / Tiny Ski / Tiny
-// Battle packs. Audio is Kenney's CC0 Interface Sounds, Impact Sounds and
+// Art is Kenney's CC0 Scribble Dungeons / Platformer Pack Nautical / Hexagon
+// Base Pack / Space Station Kit, two themes cut from each; three of the four
+// sheets are assembled by scripts/pack-tileset.mjs, and public/tilesets/README.md
+// says why. Audio is Kenney's CC0 Interface Sounds, Impact Sounds and
 // Music Jingles packs, renamed on the way in so a filename says what the
 // sound is *for* rather than what it sounds like.
 
