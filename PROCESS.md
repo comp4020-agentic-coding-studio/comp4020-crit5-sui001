@@ -1,9 +1,5 @@
 # Process overview
 
-<!-- TEMPLATE: this file is a shape to fill in, not a form. Replace everything
-     in it with your own overview, and delete this comment — `pnpm
-     check:evidence` will remind you if it's still here. -->
-
 A reading-guide to how the work came together --- a map to your process, not an
 essay about it. Markers read this file and follow its citations; they don't
 trawl the repo for evidence you didn't point at, so if a moment mattered, cite
@@ -17,45 +13,37 @@ cover every deliverable.
 
 ## What I built
 
-One paragraph: the thing, and the idea behind it.
+A top-down/garden/shop game built on kaplay: the player runs a tile-based
+level grabbing pickups on a shared beat, banks currency between runs to buy
+synergy upgrades, and the whole thing plays without a tutorial screen ever
+telling you the rules.
 
 ## The moments that mattered
 
-Three or four for an assignment; fewer is fine for a weekly prototype. Keep the
-list short so each moment has room to do all four jobs:
+1. **Turning the "no tutorial" spec line into a gate before writing the loop.**
+   The brief bans a tutorial screen, which is easy to violate by accident once
+   you're deep in level code and reach for "just add a hint." I wrote
+   `spec/level.test.ts`'s no-tutorial contract test before the top-down loop
+   existed, so the loop had to be legible from tile layout and pickup
+   placement alone, not from a check added after the fact.
+   [`34e534a`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-sui001/commit/34e534a)
 
-1. **what happened** --- the problem, or the thing that went wrong
-2. **what you did instead of the obvious thing** --- the call you made, and why
-   it beat the obvious one
-3. **how you knew it was right** --- the check you ran, the viewport you looked
-   at, what you read before accepting the diff
-4. **the citation** --- a commit or commit range, a `CLAUDE.md` change, a check
-   that went from red to green, a prompt paired with the commit it produced
+2. **Every lit thing was good, so nothing was a decision.** Once the top-down
+   loop was scoring, I noticed a miss cost nothing and every pickup was safe
+   --- there was no moment where pressing the button could be wrong. Rather
+   than tune numbers, I added a beat clock (`beat.ts`) that everything hangs
+   off, and hazards/decoys (`pickups.ts`) that render like a spark until
+   you're on top of them, so combo scoring rewards reading the beat instead of
+   mashing the button.
+   [`20c1b54`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-sui001/commit/20c1b54)
 
-Jobs 2 and 3 are the ones the repo can't tell a reader on its own, so they're
-where the marks are. The strongest moments are the ones where a correction
-landed in the **harness** --- the standards and checks your work has to satisfy
---- rather than in a retry: a rule added to `CLAUDE.md`, a check wired up, an
-attempt thrown away. Retrying until it passes is the routine case, and changing
-what the work runs against is the skilled one.
-
-Cite each moment as a link whose text is the commit hash or range and whose
-target is this repo's commit or compare URL, so a reader clicks straight to the
-evidence:
-
-- one commit: [`a1b2c3d`](https://github.com/YOUR-ORG/YOUR-REPO/commit/a1b2c3d)
-- a range:
-  [`a1b2c3d...e4f5a6b`](https://github.com/YOUR-ORG/YOUR-REPO/compare/a1b2c3d...e4f5a6b)
-
-To pair a prompt with the commit it produced, quote the prompt (curated, not a
-full transcript) next to the citation:
-
-> the prompt, verbatim
-
-Screenshots are welcome where one carries the verification better than a
-sentence does. Commit the file to this repo and link it with a **relative**
-path, which is what makes it render on GitHub: `![alt text](docs/before.png)`.
-Images don't count towards the word count and don't replace the citation.
+3. **A font bug the test suite couldn't have caught.** Looking at the deployed
+   canvas at a non-1:1 window size, "Pickup" rendered as "Pirkup" --- kaplay's
+   bitmap font losing pixel columns under fractional CSS scaling. `pnpm check`
+   was green the whole time; only opening the page and looking at it surfaced
+   it. Fixed by snapping the canvas to a whole-number scale (`fit-canvas.ts`)
+   instead of trying to patch the font.
+   [`20c1b54`](https://github.com/comp4020-agentic-coding-studio/comp4020-crit5-sui001/commit/20c1b54)
 
 ## Before you ship
 
