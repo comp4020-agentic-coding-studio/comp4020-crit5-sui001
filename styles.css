@@ -26,12 +26,14 @@ a {
 
 #game {
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
+/* Size is set by fit-canvas.ts, which snaps it to a whole-number multiple of
+   the 1280x720 render target. Fractional scaling here is what mangled the
+   font, so no width/height rules belong in this block. */
 #game canvas {
-  width: 100%;
-  height: 82vh;
   display: block;
-  margin: 0 auto;
   image-rendering: pixelated;
 }

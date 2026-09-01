@@ -33,6 +33,8 @@ export interface Theme {
   bg: [number, number, number];
 }
 
+import { random as defaultRandom } from "./rng";
+
 const p = (w: number, ...tiles: number[]): PropDef => ({ w, tiles });
 
 export const THEMES: readonly Theme[] = [
@@ -263,9 +265,21 @@ export const SHEETS: ReadonlyArray<{ name: string; cols: number; rows: number }>
 // is the one outcome that makes the set feel smaller than it is.
 let lastThemeId: string | null = null;
 
-export function rollTheme(random: () => number = Math.random): Theme {
-  const fresh = THEMES.filter((t) => t.id !== lastThemeId);
-  const picked = fresh[Math.floor(random() * fresh.length)];
+export function rollTheme(
+  allowed?: readonly string[],
+  random: () => number = defaultRandom,
+): Theme {
+  const pool = allowed && allowed.length > 0
+    ? THEMES.filter((t) => allowed.includes(t.id))
+    : THEMES;
+  const usable = pool.length > 0 ? pool : THEMES;
+  const fresh = usable.filter((t) => t.id !== lastThemeId);
+  const options = fresh.length > 0 ? fresh : usable;
+  const picked = options[Math.floor(random() * options.length)];
   lastThemeId = picked.id;
   return picked;
+}
+
+export function resetThemeHistory(): void {
+  lastThemeId = null;
 }

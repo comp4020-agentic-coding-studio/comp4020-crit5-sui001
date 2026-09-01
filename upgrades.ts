@@ -9,7 +9,10 @@ export type UpgradeId =
   | "walkSpeed"
   | "autoCollector"
   | "resonanceDiscount"
-  | "universalResonance";
+  | "universalResonance"
+  | "blink"
+  | "purge"
+  | "drag";
 
 export interface UpgradeDef {
   id: UpgradeId;
@@ -63,6 +66,33 @@ export const UPGRADES: readonly UpgradeDef[] = [
     costGrowth: 1,
     maxLevel: 1,
     requires: "autoCollector",
+  },
+  // Active abilities. They cost more than the passives because they change
+  // what you can DO rather than tuning a number, and each one answers a
+  // specific pressure: the chaser, hazards, and a reach window too tight.
+  {
+    id: "blink",
+    name: "Blink",
+    description: "Q jumps you a stretch further down the road. The thing behind you does not.",
+    baseCost: 25,
+    costGrowth: 1,
+    maxLevel: 1,
+  },
+  {
+    id: "purge",
+    name: "Purge",
+    description: "E safely destroys everything harmful in reach. Costs nothing but the cooldown.",
+    baseCost: 30,
+    costGrowth: 1,
+    maxLevel: 1,
+  },
+  {
+    id: "drag",
+    name: "Drag",
+    description: "Hold Shift to walk slow and stretch every reach window -- while it eats your pending sparks.",
+    baseCost: 35,
+    costGrowth: 1,
+    maxLevel: 1,
   },
 ];
 

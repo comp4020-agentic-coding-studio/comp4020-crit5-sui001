@@ -4,6 +4,7 @@
 // with "keep going" continuing the incremental for anyone who wants more.
 
 import type { KAPLAYCtx } from "kaplay";
+import { UI_FONT } from "./assets";
 import { sfx } from "./sfx";
 import type { RunState } from "./state";
 
@@ -21,7 +22,8 @@ function showCheckpoint(k: KAPLAYCtx, state: RunState, onContinue: () => void): 
 
   k.add([
     k.text("One universe down. Call it five minutes of flickering.", {
-      size: 26,
+      size: 24,
+      font: UI_FONT,
       width: k.width() - 160,
       align: "center",
     }),
@@ -42,7 +44,7 @@ function showCheckpoint(k: KAPLAYCtx, state: RunState, onContinue: () => void): 
     CHECKPOINT_TAG,
   ]);
   k.add([
-    k.text("end here", { size: 20 }),
+    k.text("end here", { size: 19, font: UI_FONT }),
     k.pos(k.width() / 2 - 240, k.height() / 2 + 20),
     k.anchor("center"),
     k.fixed(),
@@ -65,7 +67,7 @@ function showCheckpoint(k: KAPLAYCtx, state: RunState, onContinue: () => void): 
     CHECKPOINT_TAG,
   ]);
   k.add([
-    k.text("keep flickering", { size: 20 }),
+    k.text("keep flickering", { size: 19, font: UI_FONT }),
     k.pos(k.width() / 2 + 20, k.height() / 2 + 20),
     k.anchor("center"),
     k.fixed(),

@@ -13,9 +13,35 @@
 
 import type { KAPLAYCtx } from "kaplay";
 import { CLIPS_PER_FAMILY, FAMILIES } from "./music";
+import { SFX_VARIANTS } from "./sfx";
 import { SHEETS } from "./themes";
 
+// The bundled face, loaded either way so switching to it is a one-word change.
+const BUNDLED_FONT = "kenney";
+
+// kaplay resolves a text `font` by looking for a bitmap font, then a loaded
+// font, then falling back to any browser family that document.fonts.check()
+// accepts. A plain system sans wins here on the one axis that matters: the
+// bundled Kenney faces are display fonts, and at UI sizes their stylised caps
+// turned "SPARKS" into "SPARHS" and "PICKUP" into "PICHUP". Legibility beats
+// theming for a HUD -- swap this to BUNDLED_FONT if you'd rather have the
+// pixel look back.
+function resolveUiFont(): string {
+  try {
+    if (typeof document !== "undefined" && document.fonts?.check("64px sans-serif")) {
+      return "sans-serif";
+    }
+  } catch {
+    // check() throws on some shorthand parses; fall through to the bundled face.
+  }
+  return BUNDLED_FONT;
+}
+
+export const UI_FONT = resolveUiFont();
+
 export function loadAssets(k: KAPLAYCtx): void {
+  k.loadFont(BUNDLED_FONT, "fonts/kenney-future.ttf");
+
   for (const sheet of SHEETS) {
     k.loadSprite(sheet.name, `tilesets/${sheet.name}.png`, {
       sliceX: sheet.cols,
@@ -23,13 +49,11 @@ export function loadAssets(k: KAPLAYCtx): void {
     });
   }
 
-  k.loadSound("pickup", "audio/pickup.ogg");
-  k.loadSound("clear", "audio/clear.ogg");
-  k.loadSound("bounce", "audio/bounce.ogg");
-  k.loadSound("thud", "audio/thud.ogg");
-  k.loadSound("jump", "audio/jump.ogg");
-  k.loadSound("buy", "audio/buy.ogg");
-  k.loadSound("settle", "audio/settle.ogg");
+  for (const [name, count] of Object.entries(SFX_VARIANTS)) {
+    for (let i = 0; i < count; i++) {
+      k.loadSound(`${name}${i}`, `audio/${name}${i}.ogg`);
+    }
+  }
 
   for (const family of FAMILIES) {
     for (let i = 0; i < CLIPS_PER_FAMILY; i++) {
